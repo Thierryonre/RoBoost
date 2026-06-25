@@ -1,45 +1,76 @@
-from threading import Thread
+import cv2
+import numpy as np
+import pyrealsense2 as rs
 from libraries.arm import Arm
 from libraries.vision import Vision
+from physicalai.capture import RealSenseCamera
+from physicalai.capture.camera import ColorMode
+from pprint import pprint
+from threading import Thread
+
+LOGGING = False
+LIFT_DISTANCE = 0.1
 
 def main():
 	# Declare variables
 	itemsInGlobalView = []
 
 	# Load everything
+	if LOGGING: print("Loading")
 	arm = Arm()
 	vision = Vision()
 
+	if LOGGING: print("Initialising camera")
 	with RealSenseCamera(
-		serial_number=serialNumber,
+		# serial_number="130322270884",	# Loose camera
+		serial_number="130322272460",	# Mounted camera
 		width=640,
 		height=480,
-		fps=10,
+		fps=15,			# [90/60/30/15/5] rs-enumerate-devices
+		color_mode=ColorMode.BGR
 	) as camera:
 		while True:
 			# Start the thread for finding all of the objects
-			Thread(target=, daemon=True).start()
+			# Thread(target=, daemon=True).start()
+			itemsInGlobalView = [{"coords": 0}]
 
 			for item in itemsInGlobalView:
 				# Approach the item
-				arm.approach["coords"]
-				
+				if LOGGING: print("Approaching item")
+				arm.approach(item["coords"])
+
 				# Get a frame from the camera
-	  		  	rgb, depth = camera.read_rgbd()
+				if LOGGING: print("Getting camera rgbd data")
+				bgr, depth = vision.getAlignedFrames(camera)
+
+				# Find the bounding box of the object
+				# boundingBoxes, rawBoundingBoxes = vision.createBoundingBox(bgr)
+				# annotatedResult = rawBoundingBoxes.plot()
+				# cv2.imwrite("images/outputWithBoxes.jpg", annotatedResult)
 
 				# Find the mask of the object
-				mask = vision.createMask(rgb)
+				if LOGGING: print("Creating the mask")
+				masks, rawMasks = vision.createMasks(bgr)
+				annotatedResult = rawMasks.plot()
+				cv2.imwrite("images/outputWithMask.jpg", annotatedResult)
 
-				# Find the centroid of the mask
-				centroid = vision.getCentroid(mask)
+				# Display the image (optional)
+				if LOGGING: print("Showing the image")
+				# cv2.imshow("RealSense Camera View", bgr)
+				cv2.imwrite("cameraTest.png", bgr)
 
-				# Get the depth of the centroid
-				centroidDepth = vision.findDepth(centroid)
+				# Add the centroid of each mask and its depth to the masks
+				for i, mask in enumerate(masks):
+					masks[i]["centroid"] = centroid = centroidX, centroidY = vision.getCentroid(mask)
+					masks[i]["centroidDepth"] = centroidDepth = depth.get_distance(centroidX, centroidY)
+					print(centroidDepth)
+					# print(depth.get_distance(centroidX, centroidY))
+				continue
 
 				# Create a grasp for the arm and lift it upwards
 				pose = arm.createGrasp(mask, centroidDepth)
 				arm.executePose(pose)
-				liftedPose = arm.translatePoseY(pose, distance)
+				liftedPose = arm.translatePoseY(pose, LIFT_DISTANCE)
 				arm.executePose(liftedPose)
 
 				# Find the weight of the item
@@ -60,4 +91,7 @@ def main():
 				arm.release()
 
 if __name__ == "__main__":
-	main()
+	try:
+		main()
+	except KeyboardInterrupt:
+		pass

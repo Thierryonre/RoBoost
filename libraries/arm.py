@@ -15,7 +15,7 @@ class Arm:
 		pass
 
 	def calculateWeight(self):
-		pass
+		return 200
 
 	def executeWeightPose(self, weightClassification):
 		pass

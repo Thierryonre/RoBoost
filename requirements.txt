@@ -1,0 +1,5 @@
+physicalai[realsense]
+ultralytics[export]
+openvino
+opencv-python
+numpy
