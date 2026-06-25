@@ -48,31 +48,6 @@ class Vision:
 		self.detectionModel = YOLO(str(detectionVINOModelPath), task="detect")
 		self.segmentationModel = YOLO(str(segmentationVINOModelPath), task="segment")
 
-	# def createBoundingBox(self, bgr):
-	# 	rawBoundingBoxes = self.detectionModel.predict(
-	# 		source=bgr,
-	# 		conf=self.confidence,
-	# 		iou=self.iou,
-	# 		imgsz=self.imageSize,
-	# 		device=self.device,
-	# 		verbose=False,
-	# 	)[0]
-
-	# 	boundingBoxes = []
-	# 	for i in range(len(rawBoundingBoxes.boxes)):
-	# 		label = rawBoundingBoxes.names[int(rawBoundingBoxes.boxes.cls[i].item())]
-	# 		box = rawBoundingBoxes.boxes.xyxy[i].cpu().numpy() # [x1, y1, x2, y2]
-
-	# 		if label in self.canReplacementLabels:
-	# 			label = "can"
-
-	# 		boundingBoxes.append({
-	# 			"label": label,
-	# 			"box": rawBoundingBoxes.boxes.xyxy[i].cpu().numpy()				# x1, y1, x2, y2
-	# 		})
-
-	# 	return boundingBoxes, rawBoundingBoxes
-
 	def createMasks(self, bgr):
 		rawMasks = self.segmentationModel.predict(
 			source=bgr,

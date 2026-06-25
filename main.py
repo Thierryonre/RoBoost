@@ -43,11 +43,6 @@ def main():
 				if LOGGING: print("Getting camera rgbd data")
 				bgr, depth = vision.getAlignedFrames(camera)
 
-				# Find the bounding box of the object
-				# boundingBoxes, rawBoundingBoxes = vision.createBoundingBox(bgr)
-				# annotatedResult = rawBoundingBoxes.plot()
-				# cv2.imwrite("images/outputWithBoxes.jpg", annotatedResult)
-
 				# Find the mask of the object
 				if LOGGING: print("Creating the mask")
 				masks, rawMasks = vision.createMasks(bgr)
@@ -56,15 +51,12 @@ def main():
 
 				# Display the image (optional)
 				if LOGGING: print("Showing the image")
-				# cv2.imshow("RealSense Camera View", bgr)
 				cv2.imwrite("cameraTest.png", bgr)
 
 				# Add the centroid of each mask and its depth to the masks
 				for i, mask in enumerate(masks):
 					masks[i]["centroid"] = centroid = centroidX, centroidY = vision.getCentroid(mask)
 					masks[i]["centroidDepth"] = centroidDepth = depth.get_distance(centroidX, centroidY)
-					print(centroidDepth)
-					# print(depth.get_distance(centroidX, centroidY))
 				continue
 
 				# Create a grasp for the arm and lift it upwards
