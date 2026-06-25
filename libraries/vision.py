@@ -22,6 +22,7 @@ class Vision:
 		self.confidence = confidence
 		self.iou = iou
 		self.imageSize = imageSize
+		self.onlyUseRelevantSegmentClasses = onlyUseRelevantSegmentClasses
 
 		# Only objects with these labels are passed to the segmentation model.
 		self.relevantSegmentClasses = ["bottle", "can"]
@@ -60,7 +61,7 @@ class Vision:
 			if label in self.canReplacementLabels:
 				label = "can"
 
-			if onlyUseRelevantSegmentClasses:
+			if self.onlyUseRelevantSegmentClasses:
 				if label not in self.relevantSegmentClasses:
 					continue
 
