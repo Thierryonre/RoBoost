@@ -46,18 +46,22 @@ def main():
 				# Find the mask of the object
 				if LOGGING: print("Creating the mask")
 				masks, rawMasks = vision.createMasks(bgr)
-				annotatedResult = rawMasks.plot()
-				cv2.imwrite("images/outputWithMask.jpg", annotatedResult)
-
-				# Display the image (optional)
-				if LOGGING: print("Showing the image")
-				cv2.imwrite("cameraTest.png", bgr)
 
 				# Add the centroid of each mask and its depth to the masks
+				centroids = []
 				for i, mask in enumerate(masks):
 					masks[i]["centroid"] = centroid = centroidX, centroidY = vision.getCentroid(mask)
 					masks[i]["centroidDepth"] = centroidDepth = depth.get_distance(centroidX, centroidY)
-				continue
+					centroids.append((centroidX, centroidY)) # For annotating the centroids on the masks for display
+				print(f"Number of masks found: {len(masks)}")
+
+				# Display the image (optional)
+				annotatedResult = rawMasks.plot()
+				for centroid in centroids:
+					cv2.circle(annotatedResult, (centroid[0], centroid[1]), radius=5, color=(0, 0, 255), thickness=-1)
+				cv2.imwrite("images/outputWithMask.jpg", annotatedResult)
+
+				continue # NOTE: REMOVE TO EXECUTE THE REST OF THE CODE
 
 				# Create a grasp for the arm and lift it upwards
 				pose = arm.createGrasp(mask, centroidDepth)
