@@ -13,7 +13,7 @@ class Vision:
 		confidence: float = 0.35,
 		iou: float = 0.70,
 		imageSize: int = 640,
-		segmentationWeights: str = "yolo26m-seg.pt",
+		onlyUseRelevantSegmentClasses: bool = False,
 	):
 		self.modelDir = Path(modelDir)
 		self.modelDir.mkdir(parents=True, exist_ok=True)
@@ -24,19 +24,12 @@ class Vision:
 		self.imageSize = imageSize
 
 		# Only objects with these labels are passed to the segmentation model.
-		self.segmentClasses = ["bottle", "can"]
+		self.relevantSegmentClasses = ["bottle", "can"]
 		self.canReplacementLabels = ["skateboard"]
 
 		# Download and export the models when OpenVINO versions are unavailable.
-		detectionYOLOModelPath = self.modelDir / "yolo26m.pt"
 		segmentationYOLOModelPath = self.modelDir / "yolo26m-seg.pt"
-		detectionVINOModelPath = self.modelDir / "yolo26m_openvino_model/"
 		segmentationVINOModelPath = self.modelDir / "yolo26m-seg_openvino_model/"
-
-		if not detectionVINOModelPath.exists():
-			print("OpenVINO Detection model cannot be found - converting to OpenVINO now")
-			model = YOLO(str(detectionYOLOModelPath))
-			model.export(format="openvino", half=True)
 
 		if not segmentationVINOModelPath.exists():
 			print("OpenVINO Segmentation model cannot be found - converting to OpenVINO now")
@@ -45,7 +38,6 @@ class Vision:
 
 		# Load the OpenVINO Models
 		print("Loading the OpenVINO models")
-		self.detectionModel = YOLO(str(detectionVINOModelPath), task="detect")
 		self.segmentationModel = YOLO(str(segmentationVINOModelPath), task="segment")
 
 	def createMasks(self, bgr):
@@ -67,6 +59,10 @@ class Vision:
 
 			if label in self.canReplacementLabels:
 				label = "can"
+
+			if onlyUseRelevantSegmentClasses:
+				if label not in self.relevantSegmentClasses:
+					continue
 
 			masks.append({
 				"label": label,

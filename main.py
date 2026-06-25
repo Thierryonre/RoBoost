@@ -18,7 +18,7 @@ def main():
 	# Load everything
 	if LOGGING: print("Loading")
 	arm = Arm()
-	vision = Vision()
+	vision = Vision(onlyUseRelevantSegmentClasses=False)
 
 	if LOGGING: print("Initialising camera")
 	with RealSenseCamera(
