@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import pyrealsense2 as rs
 from libraries.arm import Arm
+from libraries.network import Network
 from libraries.vision import Vision
 from physicalai.capture import RealSenseCamera
 from physicalai.capture.camera import ColorMode
@@ -18,6 +19,7 @@ def main():
 	# Load everything
 	if LOGGING: print("Loading")
 	arm = Arm()
+	network = Network()
 	vision = Vision(onlyUseRelevantSegmentClasses=False)
 
 	if LOGGING: print("Initialising camera")
@@ -33,6 +35,7 @@ def main():
 			# Start the thread for finding all of the objects
 			# Thread(target=, daemon=True).start()
 			itemsInGlobalView = [{"coords": 0}]
+			# itemsInGlobalView = network.getItemsInGlobalView()
 
 			for item in itemsInGlobalView:
 				# Approach the item

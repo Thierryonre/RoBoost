@@ -1,5 +1,6 @@
+flask
+numpy
+opencv-python
+openvino
 physicalai[realsense]
 ultralytics[export]
-openvino
-opencv-python
-numpy
