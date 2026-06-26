@@ -1,0 +1,1 @@
+SUBSYSTEM=="video4linux", ATTRS{serial}=="SN0001", ENV{ID_V4L_CAPABILITIES}=="*:capture:*", SYMLINK+="global_camera"

@@ -26,9 +26,10 @@ TARGET_CLASSES = {
     "bottle",
     "sports ball",
     "book",
-    "skateboard"
+    "skateboard",
+    "hot_dog",
+    "carrot"
 }
-
 # Maximum number of objects to show and send.
 MAX_OBJECTS = 2
 
@@ -75,7 +76,7 @@ model = YOLO(MODEL_PATH, task="detect")
 # Open camera
 # -----------------------------
 
-cap = cv2.VideoCapture("/dev/video1", cv2.CAP_V4L2)
+cap = cv2.VideoCapture("/dev/global_camera", cv2.CAP_V4L2)
 cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)

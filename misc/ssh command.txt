@@ -1,0 +1,2 @@
+ssh intel-ptl-jb-1@10.183.174.38
+H@ckathon2026

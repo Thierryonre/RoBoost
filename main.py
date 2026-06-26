@@ -19,15 +19,15 @@ def main():
 	# Load everything
 	if LOGGING: print("Loading")
 	arm = Arm()
-	network = Network()
+	network = Network(transmittingAddress="192.168.11.5", transmittingPort=5556)
 	vision = Vision(onlyUseRelevantSegmentClasses=False)
 
 	if LOGGING: print("Initialising camera")
 	with RealSenseCamera(
 		# serial_number="130322270884",	# Loose camera
 		serial_number="130322272460",	# Mounted camera
-		width=640,
-		height=480,
+		width=1280,
+		height=720,
 		fps=15,			# [90/60/30/15/5] rs-enumerate-devices
 		color_mode=ColorMode.BGR
 	) as camera:
@@ -35,7 +35,6 @@ def main():
 			# Start the thread for finding all of the objects
 			# Thread(target=, daemon=True).start()
 			itemsInGlobalView = [{"coords": 0}]
-			# itemsInGlobalView = network.getItemsInGlobalView()
 
 			for item in itemsInGlobalView:
 				# Approach the item
@@ -56,13 +55,30 @@ def main():
 					masks[i]["centroid"] = centroid = centroidX, centroidY = vision.getCentroid(mask)
 					masks[i]["centroidDepth"] = centroidDepth = depth.get_distance(centroidX, centroidY)
 					centroids.append((centroidX, centroidY)) # For annotating the centroids on the masks for display
-				print(f"Number of masks found: {len(masks)}")
+				# print(f"Number of masks found: {len(masks)}")
 
-				# Display the image (optional)
+				# Remove any masks which are too close (the gripper)
+				masks, rawMasks = vision.removeInvalidDepthMasks(masks, rawMasks)
+				print(len(masks), len(rawMasks))
+
+				# Save the mask image with the centroids
 				annotatedResult = rawMasks.plot()
 				for centroid in centroids:
 					cv2.circle(annotatedResult, (centroid[0], centroid[1]), radius=5, color=(0, 0, 255), thickness=-1)
 				cv2.imwrite("images/outputWithMask.jpg", annotatedResult)
+
+				# Focus on the mask that is closest
+				mask = min(masks, key=lambda mask: mask["centroidDepth"], default=None)
+
+				# If there is a closest mask, send it to the arm via the socket
+				if len(masks) != 0:
+					network.sendDataToArm({
+						"label": mask["label"],
+						"centroid": mask["centroid"],
+						"centroidDepth": mask["centroidDepth"]
+					}, "hand")
+
+					# print(f"{mask['centroidDepth']} \t {mask['label']}")
 
 				continue # NOTE: REMOVE TO EXECUTE THE REST OF THE CODE
 
