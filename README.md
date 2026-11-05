@@ -1,8 +1,8 @@
 # RoBoost
 
-🥇 **Winner of the EUROPE EMBODIED 48h Hackathon**
+## 🥇 **Winner of the EUROPE EMBODIED 48h Hackathon**
 
-Overall winner and winner for Intel's Industrial Arm Challenge.
+### Overall Winner and Winner for Intel's Industrial Arm Challenge.
 
 ## The idea
 
