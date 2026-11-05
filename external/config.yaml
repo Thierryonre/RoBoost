@@ -1,0 +1,37 @@
+# System configuration for Panda peg placement task
+
+camera:
+  device_id: ""  # Camera serial number (optional, empty uses first detected)
+  width: 1280
+  height: 720
+  fps: 30
+
+vla:
+  model_id_or_path: "HuggingFaceTB/SmolVLM2-256M-Instruct"  # Or your local converted OpenVINO directory
+  device: "CPU"  # "CPU", "GPU", or "NPU"
+  shape_options: ["circle", "triangle", "square"]
+
+robot:
+  # Execution mode: "ros2", "mujoco", or "mock" (simulated)
+  mode: "mock"
+  
+  # Robot namespace/name for multipanda_ros2
+  robot_name: "panda"
+  
+  # Standard coordinate frames
+  base_frame: "panda_link0"
+  ee_frame: "panda_hand"
+  
+  # Safety boundaries and movement parameters (meters)
+  pre_grasp_offset_z: 0.1
+  grasp_depth_z: 0.02
+  insert_offset_z: 0.1
+  insert_depth_z: 0.03
+  
+  # Default overhead search/scanning pose: [x, y, z, roll, pitch, yaw]
+  scan_pose: [0.4, 0.0, 0.5, 3.14159, 0.0, 0.0]
+
+# Hand-eye calibration matrix (from end-effector frame to camera frame)
+hand_eye_calibration:
+  translation: [0.05, -0.02, 0.08]  # [x, y, z] in meters relative to panda_hand
+  rotation_quaternion: [0.0, 0.0, 0.0, 1.0]  # [x, y, z, w]
